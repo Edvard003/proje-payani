@@ -91,3 +91,45 @@
             </div>
         </div>
     </div>
+
+
+    <div class="news-container">
+        <?php
+        include 'includes/db.php';
+        $categories = $conn->query("SELECT id, name FROM categories ORDER BY id");
+        while ($row = $categories->fetch_assoc()) {
+            $cat_id = $row['id'];
+            $cat_name = $row['name'];
+            $stmt = $conn->prepare("SELECT n.*, c.name FROM news n JOIN categories c ON n.category_id = c.id WHERE n.category_id = ? AND n.status = 'approved' ORDER BY date DESC LIMIT 3");
+            $stmt->bind_param("i", $cat_id);
+            $stmt->execute();
+            $news = $stmt->get_result();
+            if ($news->num_rows > 0) {
+                echo "<h3 style='color: #FFFFFF; text-align: center; margin: 20px 0; background: #FF4500; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);'>" . htmlspecialchars($cat_name) . "</h3>";
+                echo "<div class='news-grid'>";
+                while ($row = $news->fetch_assoc()) {
+                    $rawImage = $row['image'];
+                    $imagePath = !empty($row['image']) ? (preg_match('/^\/images\//', $row['image']) ? $row['image'] : '/images/' . htmlspecialchars(basename($row['image']))) : '/images/default.jpg';
+                    $fullPath = $_SERVER['DOCUMENT_ROOT'] . $imagePath;
+                    if (!file_exists($fullPath)) {
+                        error_log("تصویر یافت نشد در $fullPath برای خبر: " . $row['title']);
+                        $imagePath = '/images/default.jpg';
+                    }
+                    echo "<div class='card'>
+                    <img src='" . $imagePath . "' alt='" . htmlspecialchars($row['title']) . "' class='card-img-top' 
+                        onerror=\"this.src='/images/default.jpg'; console.log('خطا در بارگذاری تصویر کارت: ' + this.src + ', مسیر خام: " . addslashes($rawImage) . "');\">
+                    <div class='card-body'>
+                        <h5 class='card-title'>" . htmlspecialchars($row['title']) . "</h5>
+                        <p class='card-text'>" . htmlspecialchars(substr($row['content'], 0, 50)) . "...</p>
+                        <a href='pages/news.php?id=" . $row['id'] . "' class='btn'>بیشتر</a>
+                    </div>
+                  </div>";
+                }
+                echo "</div>";
+                echo "<div style='text-align: center; margin: 20px 0;'><a href='pages/category.php?cat_id=" . $cat_id . "' class='btn'>ادامه خبرها</a></div>";
+                echo "<div><p></p></div>";
+            }
+            $stmt->close();
+        }
+        ?>
+    </div>
