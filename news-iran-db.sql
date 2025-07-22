@@ -1,33 +1,4 @@
- ├── includes/
-│   └── db.php
-├── admin/
-│   ├── index.php
-│   ├── edit_user.php
-│   ├── delete_user.php
-│   ├── edit_news.php
-│   ├── delete_news.php
-│   ├── view_news.php
-│   ├── add_category.php
-│   └── delete_comment.php
-             images/
-├── writer/
-│   ├── index.php
-│   ├── add_news.php
-│   └── add_category.php
-├── pages/
-│   ├── news.php
-│   ├── category.php
-│   ├── search.php
-│   ├── comment.php
-│   └─
-├── login.php
-├── login_process.php
-├── logout.php           
-└── index.php
- 
- 
- 
- CREATE DATABASE news_iran_db CHARACTER SET utf8mb4 COLLATE utf8mb4_persian_ci;
+CREATE DATABASE news_iran_db CHARACTER SET utf8mb4 COLLATE utf8mb4_persian_ci;
 USE news_iran_db;
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
