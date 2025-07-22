@@ -5,7 +5,174 @@
     <meta charset="UTF-8">
     <title>اخبار ایران</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF5E1;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: #FF0000;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-radius: 10px;
+        }
+
+        .navbar .nav-link {
+            color: #FFFFFF !important;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+
+        .navbar .nav-link:hover {
+            color: #FFD700 !important;
+        }
+
+        .dropdown-menu {
+            background-color: #FF6347;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .dropdown-item {
+            color: #FFFFFF;
+        }
+
+        .dropdown-item:hover {
+            background-color: #CC0000;
+            color: #FFD700;
+        }
+
+        .carousel-container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            background: #000000;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-carousel {
+            width: 100%;
+            height: 60vh;
+            overflow: hidden;
+        }
+
+        .image-carousel .carousel-item {
+            height: 60vh;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border-radius: 10px;
+        }
+
+        .text-carousel {
+            width: 100%;
+            background: #FF6347;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .text-carousel .carousel-item {
+            text-align: center;
+            color: #FFFFFF;
+            padding: 20px;
+        }
+
+        .text-carousel h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+
+        .text-carousel p {
+            font-size: 1em;
+            margin-bottom: 15px;
+            color: #FFFFFF;
+        }
+
+        .news-container {
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding-bottom: 15px;
+        }
+
+        .card {
+            min-width: 250px;
+            margin: 10px 0;
+            background: #1A1A1A;
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .card-body {
+            padding: 15px;
+            background: #333;
+            color: #FFD700;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            margin: 0 0 10px;
+        }
+
+        .card-text {
+            font-size: 0.9em;
+            margin: 0 0 10px;
+            flex-grow: 1;
+        }
+
+        .btn {
+            background-color: #FF0000;
+            color: #FFD700;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            align-self: flex-end;
+        }
+
+        .btn:hover {
+            background-color: #CC0000;
+        }
+    </style>
 </head>
 
 <body>
@@ -133,3 +300,28 @@
         }
         ?>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const imageCarousel = document.querySelector('#imageCarousel');
+        const textCarousel = document.querySelector('#textCarousel');
+
+        imageCarousel.addEventListener('slide.bs.carousel', function (e) {
+            const bsTextCarousel = bootstrap.Carousel.getOrCreateInstance(textCarousel);
+            bsTextCarousel.to(e.to); 
+        });
+
+        textCarousel.addEventListener('slide.bs.carousel', function (e) {
+            const bsImageCarousel = bootstrap.Carousel.getOrCreateInstance(imageCarousel);
+            bsImageCarousel.to(e.to); 
+        });
+
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => card.style.transform = 'scale(1.05)');
+            card.addEventListener('mouseleave', () => card.style.transform = 'scale(1)');
+        });
+    </script>
+</body>
+
+</html>
