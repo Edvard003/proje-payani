@@ -1,17 +1,31 @@
+<?php
+include 'includes/db.php';
+session_start();
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+if (!$conn) {
+    error_log("اتصال به دیتابیس برقرار نشد: " . mysqli_connect_error());
+    die("<p style='color: #FF5555; text-align: center;'>خطا در اتصال به دیتابیس: " . htmlspecialchars(mysqli_connect_error()) . "</p>");
+}
+?>
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
     <title>اخبار ایران</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #FFF5E1;
+            background-color: #121212;
             margin: 0;
             padding: 0;
-            color: #333;
+            color: #FFD700;
         }
 
         .navbar {
@@ -20,48 +34,50 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-radius: 10px;
+            border-radius: 0 0 10px 10px;
         }
 
-        .navbar .nav-link {
+        .navbar-brand,
+        .nav-link {
             color: #FFFFFF !important;
-            text-decoration: none;
-            margin: 0 15px;
             font-weight: bold;
+            transition: color 0.3s ease;
         }
 
-        .navbar .nav-link:hover {
+        .navbar-brand:hover,
+        .nav-link:hover {
             color: #FFD700 !important;
         }
 
         .dropdown-menu {
-            background-color: #FF6347;
-            border: none;
+            background-color: #1A1A1A;
+            border: 1px solid #FF0000;
             border-radius: 10px;
         }
 
         .dropdown-item {
-            color: #FFFFFF;
+            color: #FFD700;
         }
 
         .dropdown-item:hover {
-            background-color: #CC0000;
-            color: #FFD700;
+            background-color: #FF0000;
+            color: #FFFFFF;
         }
 
         .carousel-container {
             width: 100%;
-            margin: 0 auto;
+            margin: 20px auto;
             padding: 20px;
-            background: #000000;
+            background: #1A1A1A;
             border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .image-carousel {
             width: 100%;
             height: 60vh;
             overflow: hidden;
+            border-radius: 10px;
         }
 
         .image-carousel .carousel-item {
@@ -74,7 +90,7 @@
 
         .text-carousel {
             width: 100%;
-            background: #FF6347;
+            background: #333333;
             padding: 20px;
             border-radius: 10px;
             margin-top: 10px;
@@ -82,20 +98,20 @@
 
         .text-carousel .carousel-item {
             text-align: center;
-            color: #FFFFFF;
+            color: #FFD700;
             padding: 20px;
         }
 
         .text-carousel h3 {
             font-size: 1.5em;
             margin-bottom: 10px;
-            color: #FFD700;
+            color: #FFFFFF;
         }
 
         .text-carousel p {
             font-size: 1em;
             margin-bottom: 15px;
-            color: #FFFFFF;
+            color: #FFD700;
         }
 
         .news-container {
@@ -103,43 +119,44 @@
             padding: 20px;
             max-width: 1200px;
             text-align: center;
+            background: #1A1A1A;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .news-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding-bottom: 15px;
+            gap: 20px;
+            padding: 20px 0;
         }
 
         .card {
-            min-width: 250px;
-            margin: 10px 0;
-            background: #1A1A1A;
-            border: 2px solid #FFD700;
-            border-radius: 10px;
+            background: #222222;
+            border: 2px solid #FF0000;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: column;
-            height: auto;
         }
 
         .card:hover {
-            transform: scale(1.02);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
         }
 
         .card img {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: cover;
-            border-radius: 5px 5px 0 0;
+            border-radius: 12px 12px 0 0;
         }
 
         .card-body {
             padding: 15px;
-            background: #333;
+            background: #333333;
             color: #FFD700;
             flex-grow: 1;
             display: flex;
@@ -148,29 +165,48 @@
         }
 
         .card-title {
-            font-size: 1.2em;
-            margin: 0 0 10px;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #FFFFFF;
         }
 
         .card-text {
             font-size: 0.9em;
-            margin: 0 0 10px;
-            flex-grow: 1;
+            margin-bottom: 10px;
+            color: #FFD700;
         }
 
         .btn {
-            background-color: #FF0000;
-            color: #FFD700;
+            background: #FF0000;
+            color: #FFFFFF;
             border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            align-self: flex-end;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            align-self: center;
         }
 
         .btn:hover {
-            background-color: #CC0000;
+            background: #CC0000;
+            transform: scale(1.05);
+        }
+
+        h3 {
+            color: #FF0000;
+            background: #333333;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .debug-info {
+            background: #333333;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #FFFFFF;
+            text-align: center;
         }
     </style>
 </head>
@@ -193,18 +229,22 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="pages/category.php?cat_id=all">همه دسته‌ها</a></li>
                             <?php
-                            include 'includes/db.php';
                             $categories = $conn->query("SELECT id, name FROM categories ORDER BY id");
-                            while ($row = $categories->fetch_assoc()) {
-                                echo "<li><a class='dropdown-item' href='pages/category.php?cat_id=" . $row['id'] . "'>" . htmlspecialchars($row['name']) . "</a></li>";
+                            if ($categories) {
+                                while ($row = $categories->fetch_assoc()) {
+                                    echo "<li><a class='dropdown-item' href='pages/category.php?cat_id=" . $row['id'] . "'>" . htmlspecialchars($row['name']) . "</a></li>";
+                                }
+                                $categories->free();
+                            } else {
+                                error_log("خطا در بارگذاری دسته‌بندی‌ها: " . $conn->error);
+                                echo "<li><a class='dropdown-item' href='#'>خطا در بارگذاری دسته‌بندی‌ها</a></li>";
                             }
                             ?>
                         </ul>
                     </li>
                     <?php
-                    session_start();
                     if (isset($_SESSION['user_id'])) {
-                        echo "<li class='nav-item'><a class='nav-link' href='admin/index.php'>پنل مدیریت</a></li>";
+                        echo "<li class='nav-item'><a class='nav-link' href='login.php'>پنل< /a></li>";
                         echo "<li class='nav-item'><a class='nav-link' href='logout.php'>خروج</a></li>";
                     } else {
                         echo "<li class='nav-item'><a class='nav-link' href='login.php'>ورود</a></li>";
@@ -219,15 +259,24 @@
         <div id="imageCarousel" class="carousel slide image-carousel" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <?php
-                include 'includes/db.php';
-                $featured = $conn->query("SELECT * FROM news WHERE is_featured = 1 ORDER BY date DESC LIMIT 3");
+                $featured = $conn->query("SELECT * FROM news WHERE is_featured = 1 AND status = 'approved' ORDER BY date DESC LIMIT 3");
                 $first = true;
-                while ($row = $featured->fetch_assoc()) {
-                    $rawImage = $row['image'];
-                    $imagePath = (strpos($row['image'], '/images/') === 0 || strpos($row['image'], 'images/') === 0) ? $row['image'] . '?v=1' : '/images/' . htmlspecialchars($row['image']) . '?v=1';
-                    echo "<div class='carousel-item" . ($first ? " active" : "") . "' style='background-image: url(" . $imagePath . "); height: 60vh; background-size: cover; background-position: center; border-radius: 10px;'>
+                if ($featured->num_rows > 0) {
+                    while ($row = $featured->fetch_assoc()) {
+                        $imagePath = !empty($row['image']) ? (preg_match('/^\/images\//', $row['image']) ? $row['image'] : '/images/' . htmlspecialchars(basename($row['image']))) : '/images/default.jpg';
+                        $fullPath = $_SERVER['DOCUMENT_ROOT'] . $imagePath;
+                        if (!file_exists($fullPath)) {
+                            error_log("تصویر ویژه یافت نشد در $fullPath برای خبر: " . ($row['title'] ?? 'بدون عنوان'));
+                            $imagePath = '/images/default.jpg';
+                        }
+                        echo "<div class='carousel-item" . ($first ? " active" : "") . "' style='background-image: url(" . htmlspecialchars($imagePath) . ");'>
+                        </div>";
+                        $first = false;
+                    }
+                } else {
+                    echo "<div class='carousel-item active' style='background-image: url(/images/default.jpg);'>
+                        <p style='color: #FF5555; text-align: center; padding: 20px;'>هیچ خبر ویژه‌ای یافت نشد.</p>
                     </div>";
-                    $first = false;
                 }
                 ?>
             </div>
@@ -246,76 +295,86 @@
                 <?php
                 $featured->data_seek(0);
                 $first = true;
-                while ($row = $featured->fetch_assoc()) {
-                    echo "<div class='carousel-item" . ($first ? " active" : "") . "'>
-                        <h3>" . htmlspecialchars($row['title']) . "</h3>
-                        <p>" . htmlspecialchars(substr($row['content'], 0, 100)) . "...</p>
-                        <a href='pages/news.php?id=" . $row['id'] . "' class='btn btn-danger text-warning'>بیشتر</a>
+                if ($featured->num_rows > 0) {
+                    while ($row = $featured->fetch_assoc()) {
+                        echo "<div class='carousel-item" . ($first ? " active" : "") . "'>
+                            <h3>" . htmlspecialchars($row['title'] ?? 'بدون عنوان') . "</h3>
+                            <p>" . htmlspecialchars(substr($row['content'] ?? '', 0, 100)) . "...</p>
+                            <a href='pages/news.php?id=" . ($row['id'] ?? 0) . "' class='btn'>بیشتر</a>
+                        </div>";
+                        $first = false;
+                    }
+                } else {
+                    echo "<div class='carousel-item active'>
+                        <p style='color: #FF5555;'>هیچ خبر ویژه‌ای یافت نشد.</p>
                     </div>";
-                    $first = false;
                 }
+                $featured->free();
                 ?>
             </div>
         </div>
     </div>
 
-
     <div class="news-container">
         <?php
-        include 'includes/db.php';
         $categories = $conn->query("SELECT id, name FROM categories ORDER BY id");
-        while ($row = $categories->fetch_assoc()) {
-            $cat_id = $row['id'];
-            $cat_name = $row['name'];
-            $stmt = $conn->prepare("SELECT n.*, c.name FROM news n JOIN categories c ON n.category_id = c.id WHERE n.category_id = ? AND n.status = 'approved' ORDER BY date DESC LIMIT 3");
-            $stmt->bind_param("i", $cat_id);
-            $stmt->execute();
-            $news = $stmt->get_result();
-            if ($news->num_rows > 0) {
-                echo "<h3 style='color: #FFFFFF; text-align: center; margin: 20px 0; background: #FF4500; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);'>" . htmlspecialchars($cat_name) . "</h3>";
-                echo "<div class='news-grid'>";
-                while ($row = $news->fetch_assoc()) {
-                    $rawImage = $row['image'];
-                    $imagePath = !empty($row['image']) ? (preg_match('/^\/images\//', $row['image']) ? $row['image'] : '/images/' . htmlspecialchars(basename($row['image']))) : '/images/default.jpg';
-                    $fullPath = $_SERVER['DOCUMENT_ROOT'] . $imagePath;
-                    if (!file_exists($fullPath)) {
-                        error_log("تصویر یافت نشد در $fullPath برای خبر: " . $row['title']);
-                        $imagePath = '/images/default.jpg';
+        if ($categories) {
+            while ($row = $categories->fetch_assoc()) {
+                $cat_id = $row['id'];
+                $cat_name = $row['name'];
+                $stmt = $conn->prepare("SELECT n.*, c.name FROM news n JOIN categories c ON n.category_id = c.id WHERE n.category_id = ? AND n.status = 'approved' ORDER BY date DESC LIMIT 3");
+                $stmt->bind_param("i", $cat_id);
+                $stmt->execute();
+                $news = $stmt->get_result();
+                if ($news->num_rows > 0) {
+                    echo "<h3>" . htmlspecialchars($cat_name) . "</h3>";
+                    echo "<div class='news-grid'>";
+                    while ($row = $news->fetch_assoc()) {
+                        $imagePath = !empty($row['image']) ? (preg_match('/^\/images\//', $row['image']) ? $row['image'] : '/images/' . htmlspecialchars(basename($row['image']))) : '/images/default.jpg';
+                        $fullPath = $_SERVER['DOCUMENT_ROOT'] . $imagePath;
+                        if (!file_exists($fullPath)) {
+                            error_log("تصویر یافت نشد در $fullPath برای خبر: " . ($row['title'] ?? 'بدون عنوان'));
+                            $imagePath = '/images/default.jpg';
+                        }
+                        echo "<div class='card'>
+                            <img src='" . htmlspecialchars($imagePath) . "' alt='" . htmlspecialchars($row['title'] ?? 'بدون عنوان') . "' class='card-img-top'
+                                onerror=\"this.src='/images/default.jpg'; console.log('خطا در بارگذاری تصویر کارت: ' + this.src);\">
+                            <div class='card-body'>
+                                <h5 class='card-title'>" . htmlspecialchars($row['title'] ?? 'بدون عنوان') . "</h5>
+                                <p class='card-text'>" . htmlspecialchars(substr($row['content'] ?? '', 0, 50)) . "...</p>
+                                <a href='pages/news.php?id=" . ($row['id'] ?? 0) . "' class='btn'>بیشتر</a>
+                            </div>
+                        </div>";
                     }
-                    echo "<div class='card'>
-                    <img src='" . $imagePath . "' alt='" . htmlspecialchars($row['title']) . "' class='card-img-top' 
-                        onerror=\"this.src='/images/default.jpg'; console.log('خطا در بارگذاری تصویر کارت: ' + this.src + ', مسیر خام: " . addslashes($rawImage) . "');\">
-                    <div class='card-body'>
-                        <h5 class='card-title'>" . htmlspecialchars($row['title']) . "</h5>
-                        <p class='card-text'>" . htmlspecialchars(substr($row['content'], 0, 50)) . "...</p>
-                        <a href='pages/news.php?id=" . $row['id'] . "' class='btn'>بیشتر</a>
-                    </div>
-                  </div>";
+                    echo "</div>";
+                    echo "<div style='text-align: center; margin: 20px 0;'><a href='pages/category.php?cat_id=" . $cat_id . "' class='btn'>ادامه خبرها</a></div>";
+                    echo "<div><p></p></div>";
                 }
-                echo "</div>";
-                echo "<div style='text-align: center; margin: 20px 0;'><a href='pages/category.php?cat_id=" . $cat_id . "' class='btn'>ادامه خبرها</a></div>";
-                echo "<div><p></p></div>";
+                $stmt->close();
             }
-            $stmt->close();
+            $categories->free();
+        } else {
+            error_log("خطا در بارگذاری دسته‌بندی‌ها: " . $conn->error);
+            echo "<p style='color: #FF5555; text-align: center;'>خطا در بارگذاری دسته‌بندی‌ها: " . htmlspecialchars($conn->error) . "</p>";
         }
+        $conn->close();
         ?>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="../index.php" class="btn">بازگشت به خانه</a>
+        </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const imageCarousel = document.querySelector('#imageCarousel');
         const textCarousel = document.querySelector('#textCarousel');
-
         imageCarousel.addEventListener('slide.bs.carousel', function (e) {
             const bsTextCarousel = bootstrap.Carousel.getOrCreateInstance(textCarousel);
-            bsTextCarousel.to(e.to); 
+            bsTextCarousel.to(e.to);
         });
-
         textCarousel.addEventListener('slide.bs.carousel', function (e) {
             const bsImageCarousel = bootstrap.Carousel.getOrCreateInstance(imageCarousel);
-            bsImageCarousel.to(e.to); 
+            bsImageCarousel.to(e.to);
         });
-
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {
             card.addEventListener('mouseenter', () => card.style.transform = 'scale(1.05)');
