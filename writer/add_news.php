@@ -96,8 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
                             $imagePath = '/images/' . $new_filename;
                             error_log("تصویر با موفقیت آپلود شد: $imagePath");
-                            if ($edit_mode && $edit_news['image'] !== '/images/default.jpg' && file_exists(__DIR__ . '../' . $edit_news['image'])) {
-                                unlink(__DIR__ . '../' . $edit_news['image']);
+                            if ($edit_mode && $edit_news['image'] !== '/images/default.jpg' && file_exists(__DIR__ . '/../../' . $edit_news['image'])) {
+                                unlink(__DIR__ . '/../../' . $edit_news['image']);
                             }
                         } else {
                             error_log("خطا در آپلود تصویر: " . $_FILES['image']['error'] . ", مسیر: $target_file");
