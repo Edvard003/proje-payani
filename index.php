@@ -2,10 +2,6 @@
 include 'includes/db.php';
 session_start();
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 if (!$conn) {
     error_log("اتصال به دیتابیس برقرار نشد: " . mysqli_connect_error());
     die("<p style='color: #FF5555; text-align: center;'>خطا در اتصال به دیتابیس: " . htmlspecialchars(mysqli_connect_error()) . "</p>");
