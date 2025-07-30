@@ -1,120 +1,235 @@
 <?php
 include '../includes/db.php';
 session_start();
-if ($_SESSION['role'] != 'admin') header("Location: ../login.php");
+if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <title>پنل مدیریت</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #FFF5E1;
+            background-color: #121212;
             margin: 0;
-            padding: 0;
-            color: #333;
-        }
-        .row {
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            background: #FF4500;
             padding: 20px;
-            width: 30%;
             color: #FFD700;
         }
-        .nav-item {
-            margin: 10px 0;
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #1A1A1A;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
+
+        .nav-tabs {
+            border-bottom: 2px solid #FF0000;
+        }
+
         .nav-link {
             color: #FFD700;
-            text-decoration: none;
+            font-weight: bold;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
         }
-        .nav-link:hover {
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: #FF0000;
+            color: #FFFFFF;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .card {
+            background: #222222;
+            border: 2px solid #FF0000;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-body {
+            padding: 15px;
+            background: #333333;
+            color: #FFD700;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            margin-bottom: 10px;
             color: #FFFFFF;
         }
-        .content {
-            padding: 20px;
-            width: 70%;
-            background: #FFFFFF;
-            border-left: 2px solid #FFD700;
-        }
-        .card {
-            background: #FF6347;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
+
+        .card-text {
+            font-size: 0.9em;
+            margin-bottom: 10px;
             color: #FFD700;
         }
+
         .btn {
-            background-color: #FF0000;
-            color: #FFD700;
+            background: #FF0000;
+            color: #FFFFFF;
             border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-left: 5px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 5px;
         }
+
         .btn:hover {
-            background-color: #CC0000;
+            background: #CC0000;
+            transform: scale(1.05);
+        }
+
+        .btn-warning {
+            background: #FFD700;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #FFCC00;
+        }
+
+        .btn-info {
+            background: #00BFFF;
+            color: #FFFFFF;
+        }
+
+        .btn-info:hover {
+            background: #009ACD;
+        }
+
+        .btn-danger {
+            background: #FF5555;
+        }
+
+        .btn-danger:hover {
+            background: #CC3333;
+        }
+
+        h2 {
+            color: #FF0000;
+            text-align: center;
+            margin-bottom: 20px;
         }
     </style>
 </head>
+
 <body>
-    <div class="row">
-        <div class="sidebar">
-            <h4>منو</h4>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a href="?page=users" class="nav-link">کاربران</a></li>
-                <li class="nav-item"><a href="?page=news" class="nav-link">اخبار</a></li>
-                <li class="nav-item"><a href="?page=categories" class="nav-link">دسته‌بندی‌ها</a></li>
-                <li class="nav-item"><a href="?page=comments" class="nav-link">نظرات</a></li>
-            </ul>
-        </div>
-        <div class="content">
+    <div class="container">
+        <h2>پنل مدیریت</h2>
+        <ul class="nav nav-tabs justify-content-center">
+            <li class="nav-item">
+                <a class="nav-link <?php echo ($_GET['page'] ?? 'users') == 'users' ? 'active' : ''; ?>"
+                    href="?page=users">کاربران</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="view_news.php">اخبار</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="review_news.php">تأیید اخبار</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?php echo ($_GET['page'] ?? '') == 'categories' ? 'active' : ''; ?>"
+                    href="?page=categories">دسته‌بندی‌ها</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?php echo ($_GET['page'] ?? '') == 'comments' ? 'active' : ''; ?>"
+                    href="?page=comments">نظرات</a>
+            </li>
+        </ul>
+
+        <div class="content-grid">
             <?php
             $page = $_GET['page'] ?? 'users';
             if ($page == 'users') {
-                $result = $conn->query("SELECT * FROM users");
+                $stmt = $conn->prepare("SELECT * FROM users");
+                $stmt->execute();
+                $result = $stmt->get_result();
                 while ($row = $result->fetch_assoc()) {
                     echo "<div class='card'>
-                            " . $row['full_name'] . " (" . $row['role'] . ")
-                            <a href='edit_user.php?id=" . $row['id'] . "' class='btn btn-warning'>ویرایش</a>
-                            <a href='delete_user.php?id=" . $row['id'] . "' class='btn btn-danger'>حذف</a>
-                          </div>";
+                            <div class='card-body'>
+                                <h5 class='card-title'>" . htmlspecialchars($row['full_name']) . "</h5>
+                                <p class='card-text'>نقش: " . ($row['role'] == 'admin' ? 'مدیر' : 'نویسنده') . "</p>
+                                <p class='card-text'>نام کاربری: " . htmlspecialchars($row['username']) . "</p>
+                                <a href='edit_user.php?id=" . $row['id'] . "' class='btn btn-warning'>ویرایش</a>
+                                <a href='delete_user.php?id=" . $row['id'] . "' class='btn btn-danger'>حذف</a>
+                            </div>
+                        </div>";
                 }
+                $stmt->close();
             } elseif ($page == 'news') {
-                $result = $conn->query("SELECT n.*, c.name, u.full_name AS author_name FROM news n JOIN categories c ON n.category_id = c.id JOIN users u ON n.author_id = u.id WHERE n.status='pending'");
-                while ($row = $result->fetch_assoc()) {
-                    echo "<div class='card'>
-                            " . $row['title'] . " (نویسنده: " . $row['author_name'] . ")
-                            <a href='edit_news.php?id=" . $row['id'] . "' class='btn btn-warning'>ویرایش</a>
-                            <a href='delete_news.php?id=" . $row['id'] . "' class='btn btn-danger'>حذف</a>
-                            <a href='view_news.php?id=" . $row['id'] . "' class='btn btn-info'>مشاهده</a>
-                          </div>";
-                }
+                header("Location: view_news.php");
+                exit();
             } elseif ($page == 'categories') {
-                echo "<form method='POST' action='add_category.php'>
-                        <input type='text' name='name' class='form-control mb-2' placeholder='نام دسته' style='border: 1px solid #FFD700;'>
-                        <textarea name='description' class='form-control mb-2' placeholder='توضیحات' style='border: 1px solid #FFD700;'></textarea>
-                        <button type='submit' class='btn'>ایجاد</button>
-                      </form>";
-            } elseif ($page == 'comments') {
-                $result = $conn->query("SELECT c.*, n.title, u.full_name FROM comments c JOIN news n ON c.news_id = n.id JOIN users u ON c.user_id = u.id");
+                echo "<div class='card'>
+                        <div class='card-body'>
+                            <a href='add_category.php' class='btn btn-primary'>ایجاد دسته‌بندی جدید</a>
+                        </div>
+                      </div>";
+                $stmt = $conn->prepare("SELECT * FROM categories");
+                $stmt->execute();
+                $result = $stmt->get_result();
                 while ($row = $result->fetch_assoc()) {
                     echo "<div class='card'>
-                            خبر: " . $row['title'] . "<br>نظر: " . $row['comment'] . " (توسط: " . $row['full_name'] . ")
-                            <a href='delete_comment.php?id=" . $row['id'] . "' class='btn btn-danger'>حذف</a>
-                          </div>";
+                            <div class='card-body'>
+                                <h5 class='card-title'>" . htmlspecialchars($row['name']) . "</h5>
+                                <p class='card-text'>" . (empty($row['description']) ? 'بدون توضیحات' : htmlspecialchars(substr($row['description'], 0, 50)) . '...') . "</p>
+                                <a href='edit_category.php?id=" . $row['id'] . "' class='btn btn-warning'>ویرایش</a>
+                                <a href='delete_category.php?id=" . $row['id'] . "' class='btn btn-danger'>حذف</a>
+                            </div>
+                        </div>";
                 }
+                $stmt->close();
+            } elseif ($page == 'comments') {
+                $stmt = $conn->prepare("SELECT c.*, n.title, u.full_name FROM comments c JOIN news n ON c.news_id = n.id JOIN users u ON c.user_id = u.id");
+                $stmt->execute();
+                $result = $stmt->get_result();
+                while ($row = $result->fetch_assoc()) {
+                    echo "<div class='card'>
+                            <div class='card-body'>
+                                <h5 class='card-title'>خبر: " . htmlspecialchars($row['title']) . "</h5>
+                                <p class='card-text'>نظر: " . htmlspecialchars(substr($row['comment'], 0, 50)) . "...</p>
+                                <p class='card-text'>توسط: " . htmlspecialchars($row['full_name']) . "</p>
+                                <a href='delete_comment.php?id=" . $row['id'] . "' class='btn btn-danger'>حذف</a>
+                            </div>
+                        </div>";
+                }
+                $stmt->close();
             }
             ?>
-            <a href="../index.php" class="btn" style="margin-top: 20px;">بازگشت به خانه</a>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="../index.php" class="btn">بازگشت به خانه</a>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
