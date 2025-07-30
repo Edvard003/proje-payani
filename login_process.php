@@ -1,5 +1,6 @@
 <?php
 include 'includes/db.php';
+session_start();
 $username = $_POST['username'];
 $password = $_POST['password'];
 $result = $conn->query("SELECT * FROM users WHERE username='$username' AND password='$password'");

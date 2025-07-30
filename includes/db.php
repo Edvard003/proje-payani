@@ -1,5 +1,5 @@
 <?php
-$conn = new mysqli("news-iran-db", "root", "SEGmxDBcaYPfYFzvuIWJD5WC", "focused_mayer");
+$conn = new mysqli("news-iran-db", "root", "yVhCTnxOUDrs0zsgFhHwdvQc", "xenodochial_goldberg");
 if ($conn->connect_error) {
     die("اتصال به دیتابیس ناموفق: " . $conn->connect_error);
 }
