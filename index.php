@@ -244,7 +244,7 @@ if (!$conn) {
                     </li>
                     <?php
                     if (isset($_SESSION['user_id'])) {
-                        echo "<li class='nav-item'><a class='nav-link' href='login.php'>پنل< /a></li>";
+                        echo "<li class='nav-item'><a class='nav-link' href='login.php'>  پنل </a></li>";
                         echo "<li class='nav-item'><a class='nav-link' href='logout.php'>خروج</a></li>";
                     } else {
                         echo "<li class='nav-item'><a class='nav-link' href='login.php'>ورود</a></li>";
